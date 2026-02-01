@@ -58,7 +58,6 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script_stop: true
           script: |
             cd /home/adhidhi/kubedeploymentsetup
             git pull origin main || git clone https://github.com/${{ github.repository }}.git /home/adhidhi/kubedeploymentsetup
