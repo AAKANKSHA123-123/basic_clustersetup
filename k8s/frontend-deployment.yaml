@@ -16,8 +16,8 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: aakanksha0511/frontend:latest
-        imagePullPolicy: IfNotPresent
+        image: docker.io/aakanksha0511/frontend:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 80
         resources:
