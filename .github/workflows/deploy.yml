@@ -58,16 +58,30 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          timeout: 30s
+          command_timeout: 10m
           script: |
+            set -e
+            echo "🚀 Starting deployment..."
+            echo "📦 Pulling latest code..."
             cd /home/adhidhi/kubedeploymentsetup
             git pull origin main || git clone https://github.com/${{ github.repository }}.git /home/adhidhi/kubedeploymentsetup
+            
+            echo "🔧 Applying Kubernetes manifests..."
             kubectl apply -f k8s/namespace.yaml
             kubectl apply -f k8s/backend-deployment.yaml -n demo-app
             kubectl apply -f k8s/frontend-deployment.yaml -n demo-app
+            
+            echo "🔄 Restarting deployments to pull new images..."
             kubectl rollout restart deployment/backend-deployment -n demo-app || true
             kubectl rollout restart deployment/frontend-deployment -n demo-app || true
+            
+            echo "⏳ Waiting for rollout to complete..."
             kubectl rollout status deployment/backend-deployment -n demo-app --timeout=5m || true
             kubectl rollout status deployment/frontend-deployment -n demo-app --timeout=5m || true
-            echo "=== Deployment Status ==="
+            
+            echo "✅ Deployment Status:"
             kubectl get pods -n demo-app
             kubectl get svc -n demo-app
+            echo "🎉 Deployment completed successfully!"
