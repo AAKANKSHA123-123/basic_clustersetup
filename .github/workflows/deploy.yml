@@ -52,34 +52,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up kubectl
-        uses: azure/setup-kubectl@v3
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@master
         with:
-          version: 'latest'
-
-      - name: Configure kubectl
-        run: |
-          mkdir -p $HOME/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > $HOME/.kube/config
-          chmod 600 $HOME/.kube/config
-
-      - name: Verify cluster connection
-        run: |
-          kubectl cluster-info
-          kubectl get nodes
-
-      - name: Deploy to Kubernetes
-        run: |
-          kubectl apply -f k8s/namespace.yaml
-          kubectl apply -f k8s/backend-deployment.yaml -n demo-app
-          kubectl apply -f k8s/frontend-deployment.yaml -n demo-app
-
-      - name: Wait for rollout
-        run: |
-          kubectl rollout status deployment/backend-deployment -n demo-app --timeout=5m || true
-          kubectl rollout status deployment/frontend-deployment -n demo-app --timeout=5m || true
-
-      - name: Show deployment status
-        run: |
-          kubectl get pods -n demo-app
-          kubectl get svc -n demo-app
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            cd /home/adhidhi/kubedeploymentsetup
+            git pull origin main || git clone https://github.com/${{ github.repository }}.git /home/adhidhi/kubedeploymentsetup
+            kubectl apply -f k8s/namespace.yaml
+            kubectl apply -f k8s/backend-deployment.yaml -n demo-app
+            kubectl apply -f k8s/frontend-deployment.yaml -n demo-app
+            kubectl rollout restart deployment/backend-deployment -n demo-app || true
+            kubectl rollout restart deployment/frontend-deployment -n demo-app || true
+            kubectl rollout status deployment/backend-deployment -n demo-app --timeout=5m || true
+            kubectl rollout status deployment/frontend-deployment -n demo-app --timeout=5m || true
+            echo "=== Deployment Status ==="
+            kubectl get pods -n demo-app
+            kubectl get svc -n demo-app
