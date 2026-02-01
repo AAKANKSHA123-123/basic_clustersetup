@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kubernetes Demo App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Kubernetes Demo Application</h1>
+            <p>Simple Backend & Frontend Deployment</p>
+        </header>
+
+        <div class="status-bar">
+            <span id="status" class="status-indicator">Checking connection...</span>
+        </div>
+
+        <div class="main-content">
+            <div class="add-item-section">
+                <h2>Add New Item</h2>
+                <form id="itemForm">
+                    <input 
+                        type="text" 
+                        id="itemName" 
+                        placeholder="Item name" 
+                        required
+                    >
+                    <input 
+                        type="text" 
+                        id="itemDescription" 
+                        placeholder="Description (optional)"
+                    >
+                    <button type="submit">Add Item</button>
+                </form>
+            </div>
+
+            <div class="items-section">
+                <h2>Items List</h2>
+                <div id="itemsList" class="items-list">
+                    <p class="loading">Loading items...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
